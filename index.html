@@ -1,11 +1,30 @@
 <!doctype html>
+
 <html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Love Predictor</title>
 <style>
-:root{
+:root:not([data-theme="dark"]) {
+  --bg-light-1: #fdfcff;
+  --bg-light-2: #f8f2fa;
+  --text-color: #3d3d5a;
+  --text-color-muted: #6a6a82;
+  --accent-pink: #e65a82;
+  --accent-soft-pink: #ffe0e9;
+  --glass-bg: rgba(255, 252, 254, 0.7);
+  --glass-border: rgba(150, 130, 160, 0.2);
+  --shadow-strong: 0 16px 50px rgba(100, 80, 120, 0.18);
+  --input-bg: rgba(245, 240, 250, 0.7);
+  --card-radius: 24px;
+  --transition-fast: 220ms cubic-bezier(.2,.9,.25,1);
+  --transition-medium: 350ms cubic-bezier(.2,.9,.25,1);
+  --max-card-width: 1200px;
+  --focus-scale: 1.03;
+}
+
+:root[data-theme="dark"] {
   --bg-deep-1: #0f0216;
   --bg-deep-2: #3a0628;
   --rose-gold-1: rgba(255,190,200,0.95);
@@ -21,20 +40,42 @@
   --max-card-width: 1200px;
   --focus-scale: 1.03;
 }
+
 *{box-sizing:border-box;margin:0;padding:0}
 html,body,#app{height:100%}
 body{
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-  background: var(--bg-deep-1);
-  color: #fff;
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   overflow: hidden;
   line-height:1.3;
+  transition: background-color var(--transition-medium), color var(--transition-medium);
 }
-::selection{ background: rgba(255,120,165,0.25); }
+
+:root:not([data-theme="dark"]) body {
+  background: var(--bg-light-1);
+  color: var(--text-color);
+}
+
+:root[data-theme="dark"] body {
+  background: var(--bg-deep-1);
+  color: #fff;
+}
+
+::selection{ background: rgba(230, 90, 130, 0.25); }
+
 .sky{
   position:fixed; inset:0; z-index:-4;
+  transition: background var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .sky {
+  background:
+    radial-gradient(1200px 600px at 10% 20%, rgba(255, 220, 230, 0.5), transparent 40%),
+    radial-gradient(900px 500px at 90% 80%, rgba(230, 210, 255, 0.4), transparent 35%),
+    linear-gradient(170deg, var(--bg-light-1) 8%, var(--bg-light-2) 100%);
+  filter: saturate(1.1);
+}
+:root[data-theme="dark"] .sky {
   background:
     radial-gradient(1200px 600px at 10% 20%, rgba(255,200,230,0.22), transparent 25%),
     radial-gradient(900px 500px at 90% 80%, rgba(255,180,210,0.16), transparent 20%),
@@ -42,8 +83,22 @@ body{
   filter: saturate(1.1);
 }
 
+
 .stars{
   position:fixed; inset:0; pointer-events:none; z-index:-3;
+  transition: background-image var(--transition-medium), opacity var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .stars {
+  background-image:
+    radial-gradient(1px 1px at 12% 14%, var(--text-color-muted), transparent),
+    radial-gradient(1px 1px at 23% 72%, var(--text-color-muted), transparent),
+    radial-gradient(1px 1px at 70% 36%, var(--text-color-muted), transparent),
+    radial-gradient(1.3px 1.3px at 84% 56%, var(--text-color-muted), transparent),
+    radial-gradient(0.9px 0.9px at 45% 48%, var(--text-color-muted), transparent);
+  opacity:0.25;
+  animation: twinkle 12s linear infinite;
+}
+:root[data-theme="dark"] .stars {
   background-image:
     radial-gradient(1px 1px at 12% 14%, rgba(255,255,255,0.95), transparent),
     radial-gradient(1px 1px at 23% 72%, rgba(255,255,255,0.85), transparent),
@@ -57,11 +112,21 @@ body{
 @keyframes twinkle{0%,100%{filter:brightness(0.9)}50%{filter:brightness(1.3)}}
 
 .nebula{
-  position:fixed; inset:-15%; z-index:-2; opacity:0.5; mix-blend-mode:screen; filter: blur(44px) saturate(1.15);
+  position:fixed; inset:-15%; z-index:-2; mix-blend-mode:screen; filter: blur(44px) saturate(1.15);
+  animation: drift 32s linear infinite;
+  transition: background var(--transition-medium), opacity var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .nebula {
+  opacity:0.6;
+  background:
+    radial-gradient(40% 30% at 10% 10%, rgba(255,150,200,0.2), transparent),
+    radial-gradient(40% 30% at 80% 90%, rgba(200,120,220,0.15), transparent);
+}
+:root[data-theme="dark"] .nebula {
+  opacity:0.5;
   background:
     radial-gradient(40% 30% at 10% 10%, rgba(255,150,200,0.2), transparent),
     radial-gradient(40% 30% at 80% 90%, rgba(200,120,220,0.16), transparent);
-  animation: drift 32s linear infinite;
 }
 @keyframes drift{from{transform:translateY(0) translateX(0) rotate(0deg)}to{transform:translateY(-6%) translateX(4%) rotate(2deg)}}
 
@@ -69,17 +134,30 @@ body{
   position: fixed; inset:0; z-index:-1; pointer-events:none;
 }
 .bokeh-orb{
-  position:absolute; border-radius:50%; filter: blur(40px);
+  position:absolute; border-radius:50%;
+  animation: orb-drift 24s linear infinite;
+  transition: background var(--transition-medium), filter var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .bokeh-orb {
+  filter: blur(50px);
+  background: radial-gradient(circle, rgba(255, 180, 210, 0.5), rgba(230, 190, 255, 0.3));
+  mix-blend-mode: screen;
+  opacity: 0.5;
+}
+:root[data-theme="dark"] .bokeh-orb {
+  filter: blur(40px);
   background: radial-gradient(circle, rgba(255,210,230,0.6), rgba(255,150,200,0.1));
   mix-blend-mode: screen;
-  animation: orb-drift 24s linear infinite;
 }
+
 @keyframes orb-drift{0%,100%{transform:translateY(0)}50%{transform:translateY(-20px)}}
+
 .wrap{
   height:100vh; display:flex; align-items:center; justify-content:center; padding:36px;
   perspective:1800px;
   position:relative;
 }
+
 .card{
   width: min(var(--max-card-width), 95%);
   min-height: 75vh;
@@ -87,11 +165,26 @@ body{
   grid-template-columns: 1fr 1fr;
   gap: 28px;
   align-items: center;
+  border-radius: var(--card-radius);
+  padding: clamp(20px, 3.2vw, 44px);
+  backdrop-filter: blur(20px) saturate(150%);
+  transform: translateZ(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+  transition: transform 0.1s ease-out, box-shadow var(--transition-medium), background var(--transition-medium), border-color var(--transition-medium);
+  transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
+}
+:root:not([data-theme="dark"]) .card {
+  background: rgba(255, 253, 254, 0.6);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-top-color: rgba(255,255,255,0.9);
+  border-left-color: rgba(255,255,255,0.7);
+  box-shadow: var(--shadow-strong);
+}
+:root[data-theme="dark"] .card {
   background:
     linear-gradient(168deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03)),
     radial-gradient(circle at 100% 0%, rgba(255,180,210,0.08), transparent 40%);
-  border-radius: var(--card-radius);
-  padding: clamp(20px, 3.2vw, 44px);
   border: 1px solid rgba(255,255,255,0.1);
   border-top-color: rgba(255,255,255,0.18);
   border-left-color: rgba(255,255,255,0.12);
@@ -99,39 +192,43 @@ body{
     0 2px 4px rgba(255,160,200,0.08),
     0 15px 50px rgba(8,4,16,0.7),
     0 0 0 1.5px rgba(0,0,0,0.2);
-  backdrop-filter: blur(20px) saturate(150%);
-  transform: translateZ(0) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
-  transition: transform 0.1s ease-out, box-shadow var(--transition-medium);
-  transform-style: preserve-3d;
-  position: relative;
-  overflow: hidden;
 }
 
 .card::before, .card::after {
   content:''; position: absolute; z-index:-1; border-radius: inherit;
 }
-.card::before { 
+.card::before {
   inset: -100px;
-  background: radial-gradient(circle at 50% 50%, rgba(255,120,160,0.1), transparent 40%);
   animation: pulse-glow 8s ease-in-out infinite;
-  transition: opacity var(--transition-medium);
+  transition: opacity var(--transition-medium), background var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .card::before {
+  background: radial-gradient(circle at 50% 50%, rgba(230, 90, 130, 0.12), transparent 45%);
+}
+:root[data-theme="dark"] .card::before {
+  background: radial-gradient(circle at 50% 50%, rgba(255,120,160,0.1), transparent 40%);
 }
 @keyframes pulse-glow { 0%,100%{opacity:0.6; transform:scale(0.9)} 50%{opacity:1; transform:scale(1.05)} }
 
-.card::after { 
+.card::after {
   inset: -200%;
-  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.06) 48%, rgba(255,255,255,0.06) 52%, transparent 60%);
   transform: translateX(-50%) translateY(-15%);
-  transition: transform 600ms ease-out;
+  transition: transform 600ms ease-out, background var(--transition-medium);
   pointer-events: none;
+}
+:root:not([data-theme="dark"]) .card::after {
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.3) 48%, rgba(255,255,255,0.3) 52%, transparent 60%);
+}
+:root[data-theme="dark"] .card::after {
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.06) 48%, rgba(255,255,255,0.06) 52%, transparent 60%);
 }
 .card:hover::after {
   transform: translateX(15%) translateY(0%);
 }
-
 @media (max-width:820px){
   .card{ grid-template-columns:1fr; min-height: 68vh; padding:24px; gap:20px;}
 }
+
 h1{
   grid-column: 1/-1;
   font-size: clamp(22px, 2.8vw, 38px);
@@ -139,13 +236,20 @@ h1{
   margin-bottom:4px;
   font-weight:700;
   letter-spacing:-0.5px;
+  z-index:10;
+  transition: color var(--transition-medium), text-shadow var(--transition-medium);
+}
+:root:not([data-theme="dark"]) h1 {
+  color: var(--text-color);
+  text-shadow: 0 2px 20px rgba(255, 255, 255, 0.8);
+}
+:root[data-theme="dark"] h1 {
   color: #fff;
   text-shadow:
     0 0 5px rgba(255,255,255,0.8),
     0 0 15px rgba(255,200,220,0.7),
     0 0 35px rgba(255,140,170,0.5),
     0 0 60px rgba(255,120,165,0.3);
-  z-index:10;
   animation: title-glow 5s ease-in-out infinite;
 }
 @keyframes title-glow {
@@ -153,64 +257,161 @@ h1{
   50% { text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 20px rgba(255,200,220,0.8), 0 0 45px rgba(255,140,170,0.6), 0 0 75px rgba(255,120,165,0.4); }
 }
 
-.lead{grid-column:1/-1; text-align:center; opacity:0.9; font-size:15px; margin-bottom:4px; color:rgba(255,255,255,0.9)}
+.lead{
+  grid-column:1/-1;
+  text-align:center;
+  opacity:0.9;
+  font-size:15px;
+  margin-bottom:4px;
+  transition: color var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .lead {
+  color: var(--text-color-muted);
+}
+:root[data-theme="dark"] .lead {
+  color:rgba(255,255,255,0.9);
+}
+
+
 .glass{
-  background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
   border-radius:16px;
   padding:20px;
+  backdrop-filter: blur(12px) saturate(120%);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium), background var(--transition-medium), border-color var(--transition-medium);
+  will-change: transform, box-shadow;
+  min-height: 74px;
+  position:relative;
+  overflow:hidden;
+}
+:root:not([data-theme="dark"]) .glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-top-color: rgba(150, 130, 160, 0.25);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,0.8),
+    inset 0 -1px 1px rgba(0,0,0,0.03);
+}
+:root[data-theme="dark"] .glass {
+  background: linear-gradient(160deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
   border: 1px solid rgba(255,255,255,0.08);
   border-top-color: rgba(255,255,255,0.16);
   border-left-color: rgba(255,255,255,0.12);
   box-shadow:
     inset 0 2px 2px rgba(255,255,255,0.05),
     inset 0 -2px 3px rgba(0,0,0,0.2);
-  backdrop-filter: blur(12px) saturate(120%);
-  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
-  will-change: transform, box-shadow;
-  min-height: 74px;
-  position:relative;
-  overflow:hidden;
 }
 
 .glass::after {
   content: ''; position: absolute; inset: -150%;
-  background: linear-gradient(115deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
   transform: translateX(-75%);
-  transition: transform 450ms ease-in-out;
+  transition: transform 450ms ease-in-out, background var(--transition-medium);
   pointer-events: none;
+}
+:root:not([data-theme="dark"]) .glass::after {
+  background: linear-gradient(115deg, transparent 45%, rgba(255,255,255,0.6) 50%, transparent 55%);
+}
+:root[data-theme="dark"] .glass::after {
+  background: linear-gradient(115deg, transparent 45%, rgba(255,255,255,0.1) 50%, transparent 55%);
 }
 .glass:focus-within::after {
   transform: translateX(25%);
 }
-
 .glass:focus-within{
   transform: translateZ(12px) scale(var(--focus-scale));
+}
+:root:not([data-theme="dark"]) .glass:focus-within {
+  box-shadow: 0 12px 35px rgba(100, 80, 120, 0.15);
+}
+:root[data-theme="dark"] .glass:focus-within {
   box-shadow:
     0 20px 55px rgba(255,140,170,0.14),
     inset 0 2px 2px rgba(255,255,255,0.05),
     inset 0 -2px 3px rgba(0,0,0,0.2);
 }
 
-label{display:block;font-size:13px;opacity:0.9;margin-bottom:10px;color:rgba(255,255,255,0.95)}
-input[type="text"]{
-  width:100%; padding:12px 14px; border-radius:10px; border:1px solid transparent;
-  background: rgba(10,0,20,0.25); color:inherit; font-size:16px; outline:none;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.25);
-  transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+label{
+  display:block;
+  margin-bottom:10px;
+  transition: color var(--transition-medium);
 }
-input[type="text"]::placeholder{ color: rgba(255,255,255,0.4); font-size:15px; }
+:root:not([data-theme="dark"]) label {
+  font-size:14px;
+  font-weight: 500;
+  color:var(--text-color);
+}
+:root[data-theme="dark"] label {
+  font-size:13px;
+  opacity:0.9;
+  color:rgba(255,255,255,0.95);
+}
+
+input[type="text"]{
+  width:100%;
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:16px;
+  outline:none;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+  transition: box-shadow var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast), background var(--transition-medium), color var(--transition-medium);
+}
+:root:not([data-theme="dark"]) input[type="text"] {
+  border:1px solid rgba(150, 130, 160, 0.15);
+  background: var(--input-bg);
+  color:inherit;
+}
+:root[data-theme="dark"] input[type="text"] {
+  border:1px solid transparent;
+  background: rgba(10,0,20,0.25);
+  color:inherit;
+}
+input[type="text"]::placeholder{
+  font-size:15px;
+  transition: color var(--transition-medium);
+}
+:root:not([data-theme="dark"]) input[type="text"]::placeholder {
+  color: var(--text-color-muted);
+}
+:root[data-theme="dark"] input[type="text"]::placeholder {
+  color: rgba(255,255,255,0.4);
+}
 input[type="text"]:focus{
+  transform: translateY(-1px);
+}
+:root:not([data-theme="dark"]) input[type="text"]:focus {
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 12px rgba(230, 90, 130, 0.3), inset 0 2px 4px rgba(0,0,0,0.05);
+}
+:root[data-theme="dark"] input[type="text"]:focus {
   border-color: rgba(255,190,200,0.5);
   box-shadow: 0 0 22px rgba(255,150,200,0.25), inset 0 2px 4px rgba(0,0,0,0.25);
-  transform: translateY(-1px);
 }
 
 .controls{ grid-column:1/-1; display:flex; gap:12px; justify-content:center; margin-top:8px; z-index:10; }
 
 button.predict{
-  position: relative; 
-  overflow: hidden;   
-  padding: 13px 24px; border-radius:16px; cursor:pointer; font-weight:700;
+  position: relative;
+  overflow: hidden;
+  padding: 13px 24px;
+  border-radius:16px;
+  cursor:pointer;
+  font-weight:700;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  transform: translateZ(0);
+  transition: transform 300ms ease, box-shadow 300ms ease, background 300ms ease;
+  letter-spacing:0.2px;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+}
+:root:not([data-theme="dark"]) button.predict {
+  background: linear-gradient(135deg, #ff709a, #e65a82);
+  border: 1px solid transparent;
+  box-shadow:
+    inset 0 1.5px 2px rgba(255,255,255,0.3),
+    0 8px 20px rgba(180, 80, 120, 0.3);
+}
+:root[data-theme="dark"] button.predict {
   background: linear-gradient(135deg, rgba(255,154,196,0.15), rgba(255,106,158,0.1));
   border: 1px solid rgba(255,154,196,0.3);
   border-top-color: rgba(255,154,196,0.4);
@@ -218,21 +419,18 @@ button.predict{
   box-shadow:
     inset 0 1.5px 2px rgba(255,255,255,0.1),
     0 8px 20px rgba(8,4,16,0.4);
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-  transform: translateZ(0);
-  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
-  letter-spacing:0.2px;
-  display:inline-flex; align-items:center; gap:10px;
 }
+
 button.predict::before {
   content: '';
   position: absolute;
   z-index: 1;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,154,196,0.25), rgba(255,106,158,0.2));
   opacity: 0;
   transition: opacity 300ms ease;
+}
+:root[data-theme="dark"] button.predict::before {
+  background: linear-gradient(135deg, rgba(255,154,196,0.25), rgba(255,106,158,0.2));
 }
 
 button.predict > * {
@@ -242,12 +440,20 @@ button.predict > * {
 
 button.predict:hover{
   transform: translateY(-4px) scale(1.02);
+}
+:root:not([data-theme="dark"]) button.predict:hover {
+  background: linear-gradient(135deg, #ff80a5, #f06b90);
+  box-shadow:
+    inset 0 1.5px 2px rgba(255,255,255,0.35),
+    0 12px 30px rgba(200, 90, 130, 0.4);
+}
+:root[data-theme="dark"] button.predict:hover {
   border-color: rgba(255,154,196,0.5);
   box-shadow:
     inset 0 1.5px 2px rgba(255,255,255,0.15),
     0 12px 30px rgba(255,90,160,0.3);
 }
-button.predict:hover::before {
+:root[data-theme="dark"] button.predict:hover::before {
   opacity: 1;
 }
 
@@ -258,30 +464,95 @@ button.predict:active{
 
 button.predict .icon path{
   fill: #fff;
-  filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+  filter: drop-shadow(0 0 5px rgba(0,0,0,0.15));
 }
 
 .result{
-  grid-column:1/-1; margin-top:8px; padding:18px; border-radius:14px; text-align:center;
+  grid-column:1/-1;
+  margin-top:8px;
+  padding:18px;
+  border-radius:14px;
+  text-align:center;
+  transition: background var(--transition-medium), border-color var(--transition-medium), box-shadow var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .result {
+  background: rgba(255, 252, 254, 0.5);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 35px rgba(100,80,120,0.1);
+}
+:root[data-theme="dark"] .result {
   background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: 0 8px 35px rgba(0,0,0,0.5);
 }
+
 .big{
-  font-size: clamp(36px, 6.8vw, 68px); font-weight:900; letter-spacing:-1.5px; color: #fff;
-  text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,160,185,0.5), 0 0 45px rgba(255,120,160,0.2);
-  display:inline-block; padding:6px 12px; border-radius:10px;
+  font-size: clamp(36px, 6.8vw, 68px);
+  font-weight:900;
+  letter-spacing:-1.5px;
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:10px;
+  transition: color var(--transition-medium), text-shadow var(--transition-medium);
 }
-.msg{ margin-top:12px; font-size:16px; opacity:0.95; line-height:1.4; }
+:root:not([data-theme="dark"]) .big {
+  color: var(--accent-pink);
+  text-shadow: 0 4px 12px rgba(255, 210, 220, 1);
+}
+:root[data-theme="dark"] .big {
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255,255,255,0.9), 0 0 24px rgba(255,160,185,0.5), 0 0 45px rgba(255,120,160,0.2);
+}
+
+.msg{
+  margin-top:12px;
+  font-size:16px;
+  opacity:0.95;
+  line-height:1.4;
+  transition: color var(--transition-medium);
+}
+:root:not([data-theme="dark"]) .msg {
+  color: var(--text-color);
+}
+:root[data-theme="dark"] .msg {
+  color: #fff;
+}
+
 
 .note{ position:fixed; left:18px; bottom:12px; font-size:12px; opacity:0.75; z-index:3; }
 #confetti-container{ position:fixed; inset:0; pointer-events:none; z-index:1100; }
 
-.piece { position: fixed; top: 50%; left: 50%; transform-origin: center center; will-change: transform, opacity; pointer-events: none; border-radius: 6px; box-shadow: 0 6px 18px rgba(8,4,16,0.45); mix-blend-mode: screen; }
-.sparkle { position: fixed; width:6px; height:6px; border-radius:50%; background: radial-gradient(circle at 30% 30%, #fff, rgba(255,200,220,0.95)); pointer-events:none; will-change: transform, opacity; filter: drop-shadow(0 2px 6px rgba(255,180,200,0.12)); }
+.piece { position: fixed; top: 50%; left: 50%; transform-origin: center center; will-change: transform, opacity; pointer-events: none; border-radius: 6px; }
+:root:not([data-theme="dark"]) .piece {
+  box-shadow: 0 6px 18px rgba(100, 80, 120, 0.2);
+}
+:root[data-theme="dark"] .piece {
+  box-shadow: 0 6px 18px rgba(8,4,16,0.45);
+  mix-blend-mode: screen;
+}
+
+.sparkle { position: fixed; width:6px; height:6px; border-radius:50%; pointer-events:none; will-change: transform, opacity; }
+:root:not([data-theme="dark"]) .sparkle {
+  background: radial-gradient(circle at 30% 30%, #ff80a5, var(--accent-soft-pink));
+  filter: drop-shadow(0 2px 6px rgba(230, 90, 130, 0.4));
+}
+:root[data-theme="dark"] .sparkle {
+  background: radial-gradient(circle at 30% 30%, #fff, rgba(255,200,220,0.95));
+  filter: drop-shadow(0 2px 6px rgba(255,180,200,0.12));
+}
+
 .trail { position: fixed; height:4px; border-radius:4px; pointer-events:none; filter: blur(6px) saturate(1.2); opacity:0.95; transform-origin: left center; }
 .heart-mask { -webkit-mask-size: contain; mask-size: contain; -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat; -webkit-mask-position: center; mask-position:center; }
-.burst-aura{ position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); border-radius: 50%; pointer-events:none; background: radial-gradient(circle, rgba(255,180,210,0.42), rgba(255,120,165,0.12), transparent 60%); z-index:1005; will-change: width, height, opacity; mix-blend-mode: screen; filter: blur(18px); }
+.burst-aura{ position: fixed; top:50%; left:50%; transform: translate(-50%,-50%); border-radius: 50%; pointer-events:none; z-index:1005; will-change: width, height, opacity; }
+:root:not([data-theme="dark"]) .burst-aura {
+  background: radial-gradient(circle, rgba(255,180,210,0.6), rgba(255,120,165,0.2), transparent 60%);
+  filter: blur(18px);
+}
+:root[data-theme="dark"] .burst-aura {
+  background: radial-gradient(circle, rgba(255,180,210,0.42), rgba(255,120,165,0.12), transparent 60%);
+  mix-blend-mode: screen;
+  filter: blur(18px);
+}
 
 @keyframes pop {
   0%{ transform: scale(1); }
@@ -294,7 +565,93 @@ button.predict .icon path{
 }
 
 .visually-hidden{ position: absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+
+.theme-switch-wrapper {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+}
+
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #4c4c6d; 
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+input:checked + .slider {
+  background-color: #e65a82; 
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider .icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  user-select: none;
+  transition: opacity 0.2s ease;
+}
+
+.slider .moon {
+  left: 8px;
+  opacity: 1; 
+}
+
+.slider .sun {
+  right: 8px;
+  opacity: 0;
+}
+
+input:checked + .slider .moon {
+  opacity: 0; 
+}
+
+input:checked + .slider .sun {
+  opacity: 1; 
+}
+
 </style>
+
 </head>
 <body>
   <div class="sky"></div>
@@ -309,9 +666,21 @@ button.predict .icon path{
 
   <div id="confetti-container" aria-hidden="true"></div>
 
+  <div class="theme-switch-wrapper">
+    <label class="theme-switch" for="theme-toggle">
+        <input type="checkbox" id="theme-toggle" aria-label="Toggle light and dark mode"/>
+        <span class="slider">
+          <span class="icon moon">🌙</span>
+          <span class="icon sun">☀️</span>
+        </span>
+    </label>
+  </div>
+
+
   <div id="app" class="wrap" role="application" aria-label="Love Predictor application">
     <main class="card" role="main" aria-labelledby="title">
       <h1 id="title">Love Predictor</h1>
+      <p class="lead">Discover the cosmic connection between two names.</p>
 
       <div class="glass" aria-labelledby="labelA">
         <label id="labelA" for="nameA">Name 1</label>
@@ -334,7 +703,7 @@ button.predict .icon path{
         </button>
       </div>
 
-      <div class="result" id="result" aria-live="polite" aria-atomic="true">
+      <div class="result" id="result" aria-live="polite" aria-atomic="true" style="min-height: 120px;">
         <div class="big" id="percent" aria-hidden="true"></div>
         <div class="msg" id="message"></div>
       </div>
@@ -342,6 +711,22 @@ button.predict .icon path{
   </div>
 
 <script>
+(function() {
+  const themeToggle = document.getElementById('theme-toggle');
+  const docEl = document.documentElement;
+
+  function applyTheme(theme) {
+    docEl.setAttribute('data-theme', theme);
+    themeToggle.checked = theme === 'light';
+  }
+  const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(savedTheme);
+  themeToggle.addEventListener('change', () => {
+    const newTheme = themeToggle.checked ? 'light' : 'dark';
+    docEl.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+})();
 function nameToInt(name){
   if(!name) return 0;
   const s = name.normalize('NFC').toLowerCase();
@@ -397,10 +782,10 @@ function createPiece({type='rect', colorGradient, size=10, angle=0, duration=140
   el.className = 'piece'; el.style.zIndex = 1000 + depth; el.style.width = (type === 'triangle' ? 0 : size + 'px'); el.style.height = (type === 'triangle' ? 0 : size + 'px');
   const angleRad = angle; const dx = Math.cos(angleRad) * distance; const dy = Math.sin(angleRad) * distance;
   el.dataset.duration = duration; el.dataset.dx = dx; el.dataset.dy = dy; el.dataset.spin = spin; el.dataset.start = performance.now(); el.dataset.life = duration + 220;
-  if(type === 'circle'){ el.style.borderRadius = '50%'; el.style.background = colorGradient; el.style.boxShadow = '0 6px 22px rgba(8,4,16,0.35), 0 0 18px rgba(255,150,200,0.06)';
-  } else if(type === 'heart'){ el.style.width = size + 'px'; el.style.height = size + 'px'; el.style.background = colorGradient; el.style.webkitMaskImage = `url("${makeSVGDataURL(heartSVG)}")`; el.style.maskImage = `url("${makeSVGDataURL(heartSVG)}")`; el.style.maskSize = 'contain'; el.style.maskRepeat = 'no-repeat'; el.style.borderRadius = '6px'; el.style.boxShadow = '0 8px 28px rgba(8,4,16,0.28)';
-  } else if(type === 'star'){ el.style.background = colorGradient; el.style.width = size + 'px'; el.style.height = size + 'px'; el.style.webkitMaskImage = `url("${makeSVGDataURL(starSVG)}")`; el.style.maskImage = `url("${makeSVGDataURL(starSVG)}")`; el.style.maskSize = 'contain'; el.style.maskRepeat = 'no-repeat'; el.style.boxShadow = '0 6px 18px rgba(8,4,16,0.32)';
-  } else if(type === 'triangle'){ const left = (size/1.15) + 'px'; const right = left; const bottom = size + 'px'; el.style.width = 0; el.style.height = 0; el.style.borderLeft = `${left} solid transparent`; el.style.borderRight = `${right} solid transparent`; el.style.borderBottom = `${bottom} solid ${colorGradient.split(',')[0] || colorGradient}`; el.style.background = 'none'; el.style.boxShadow = '0 6px 18px rgba(8,4,16,0.24)';
+  if(type === 'circle'){ el.style.borderRadius = '50%'; el.style.background = colorGradient;
+  } else if(type === 'heart'){ el.style.width = size + 'px'; el.style.height = size + 'px'; el.style.background = colorGradient; el.style.webkitMaskImage = `url("${makeSVGDataURL(heartSVG)}")`; el.style.maskImage = `url("${makeSVGDataURL(heartSVG)}")`; el.style.maskSize = 'contain'; el.style.maskRepeat = 'no-repeat'; el.style.borderRadius = '6px';
+  } else if(type === 'star'){ el.style.background = colorGradient; el.style.width = size + 'px'; el.style.height = size + 'px'; el.style.webkitMaskImage = `url("${makeSVGDataURL(starSVG)}")`; el.style.maskImage = `url("${makeSVGDataURL(starSVG)}")`; el.style.maskSize = 'contain'; el.style.maskRepeat = 'no-repeat';
+  } else if(type === 'triangle'){ const left = (size/1.15) + 'px'; const right = left; const bottom = size + 'px'; el.style.width = 0; el.style.height = 0; el.style.borderLeft = `${left} solid transparent`; el.style.borderRight = `${right} solid transparent`; el.style.borderBottom = `${bottom} solid ${colorGradient.split(',')[0] || colorGradient}`; el.style.background = 'none';
   } else { el.style.background = colorGradient; el.style.borderRadius = '4px'; }
   const initRot = (Math.random()*60 - 30); el.style.transform = `translate(-50%,-50%) translate(0px,0px) rotate(${initRot}deg) scale(${0.95 + Math.random()*0.15})`; return el;
 }
@@ -412,46 +797,28 @@ function launchUltraPremiumConfetti({count=140, intensity=1.0} = {}){
   const aura = document.createElement('div'); aura.className = 'burst-aura'; aura.style.width = '0px'; aura.style.height = '0px'; aura.style.opacity = '0.95'; root.appendChild(aura);
   const auraDur = 1000; const auraStart = now;
   (function animateAura(){ const t = (performance.now() - auraStart)/auraDur; if(t <= 1){ const s = easeOutCubic(t); aura.style.width = (120 + s*220) + 'vh'; aura.style.height = (120 + s*220) + 'vh'; aura.style.opacity = String(1 - s); requestAnimationFrame(animateAura); } else { aura.remove(); } })();
-  const palettes = [['linear-gradient(135deg,#FFD1DC,#F7A8B8)','#FFD1DC'], ['linear-gradient(135deg,#FFF5E1,#F8D9B8)','#FFF5E1'], ['linear-gradient(135deg,#FAD6E7,#E6B8C7)','#FAD6E7'], ['linear-gradient(135deg,#E7C1A5,#D39982)','#E7C1A5'], ['linear-gradient(135deg,#FFE8F0,#FFD1E4)','#FFE8F0'],];
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const palettes = isDark ? [
+      ['linear-gradient(135deg,#FFD1DC,#F7A8B8)','#FFD1DC'], ['linear-gradient(135deg,#FFF5E1,#F8D9B8)','#FFF5E1'], ['linear-gradient(135deg,#FAD6E7,#E6B8C7)','#FAD6E7'], ['linear-gradient(135deg,#E7C1A5,#D39982)','#E7C1A5'], ['linear-gradient(135deg,#FFE8F0,#FFD1E4)','#FFE8F0'],
+    ] : [
+      ['linear-gradient(135deg,#ff709a,#e65a82)', '#ff709a'], ['linear-gradient(135deg,#ffd8e4,#ffc0d2)', '#ffd8e4'], ['linear-gradient(135deg,#a7b2ff,#8a98ff)', '#a7b2ff'], ['linear-gradient(135deg,#f0c3ff,#e2a4ff)', '#e2a4ff']
+    ];
+
   const pieces = [];
   for(let i=0;i<count;i++){ const typeRoll = Math.random(); const type = typeRoll < 0.16 ? 'heart' : typeRoll < 0.34 ? 'star' : typeRoll < 0.58 ? 'circle' : typeRoll < 0.79 ? 'rect' : 'triangle'; const pal = palettes[Math.floor(Math.random() * palettes.length)]; const size = 6 + Math.random() * 14 * (1 + intensity*0.2); const angle = Math.random() * Math.PI * 2; const distance = 120 + Math.random()*260 * (0.9 + intensity*0.6); const duration = 1000 + Math.random()*900; const spin = (Math.random()*1000 - 500); const depth = Math.random() < 0.33 ? 3 : Math.random() < 0.66 ? 2 : 1; const piece = createPiece({type, colorGradient: pal[0], size, angle, duration, distance, spin, depth}); const jitterX = (Math.random()*10 - 5); const jitterY = (Math.random()*10 - 6); piece.style.left = `calc(50% + ${jitterX}px)`; piece.style.top = `calc(50% + ${jitterY}px)`; piece.style.opacity = '0'; root.appendChild(piece);
     if(Math.random() < 0.35){ const trail = createTrail({color: pal[1], length: 120 + Math.random()*220, angle: angle, duration: duration * (0.7 + Math.random()*0.6)}); root.appendChild(trail); pieces.push({piece, trail, angle, start: performance.now(), duration}); } else { pieces.push({piece, trail: null, angle, start: performance.now(), duration}); }
   }
   const sparks = []; for(let s=0;s<18;s++){ const leftPct = 48 + (Math.random()*12 - 6); const topPct  = 48 + (Math.random()*12 - 6); const delay = Math.random() * 300; const sp = createSpark({leftPct, topPct, delay}); root.appendChild(sp); sparks.push(sp); }
-  const orbs = []; for(let o=0;o<8;o++){ const orb = document.createElement('div'); orb.style.position = 'fixed'; orb.style.borderRadius = '50%'; orb.style.left = (48 + (Math.random()*14 - 7)) + '%'; orb.style.top = (48 + (Math.random()*14 - 7)) + '%'; const s = 18 + Math.random()*36; orb.style.width = s + 'px'; orb.style.height = s + 'px'; orb.style.background = 'radial-gradient(circle, rgba(255,225,235,0.95), rgba(255,150,200,0.12))'; orb.style.filter = 'blur(8px)'; orb.style.opacity = '0'; orb.style.zIndex = 1003; root.appendChild(orb); orbs.push(orb); }
-  const startTime = performance.now();
-  let orbsFading = false;
-  let fadeOutStartTime;
-  const fadeOutDuration = 400;
 
   function loop(){
     const tNow = performance.now();
     let aliveCount = 0;
     pieces.forEach(obj=>{ const p = obj.piece; const elapsed = tNow - obj.start; const dur = obj.duration; const progress = Math.min(1, elapsed/dur); const ease = easeOutCubic(progress); const dx = parseFloat(p.dataset.dx || 0); const dy = parseFloat(p.dataset.dy || 0); const x = dx * ease; const y = dy * ease + ease * 8; const rot = (parseFloat(p.dataset.spin || 0) * ease); p.style.transform = `translate(-50%,-50%) translate(${x}px, ${y}px) rotate(${rot}deg) scale(${1 - 0.12*ease})`; if(elapsed > 16) p.style.opacity = String(Math.max(0.02, 1 - ease)); if(obj.trail){ const tr = obj.trail; tr.style.transform = `translate(-50%,-50%) rotate(${Math.atan2(dy,dx)}rad) scaleX(${0.1 + 0.9*ease})`; tr.style.opacity = String(Math.max(0, 1 - ease)); } if(progress < 1){ aliveCount++; } else { try{ p.remove(); }catch(e){} if(obj.trail){ try{ obj.trail.remove(); }catch(e){} } } });
-    sparks.forEach(s=>{ const elapsed = tNow - (parseFloat(s.dataset.start) || startTime); const dur = parseFloat(s.dataset.duration) || 2200; const t = Math.min(1, Math.max(0, elapsed/dur)); const easeT = easeOutCubic(t); s.style.transform = `translateY(${-30 * easeT}px) scale(${0.6 + 0.4*easeT})`; s.style.opacity = String(Math.max(0, 1 - easeT)); if(t < 1) { aliveCount++; } else { try{ s.remove(); }catch(e){} } });
-    
-    if (aliveCount === 0 && !orbsFading) {
-      orbsFading = true;
-      fadeOutStartTime = tNow;
-    }
+    sparks.forEach(s=>{ const elapsed = tNow - (parseFloat(s.dataset.start) || tNow); const dur = parseFloat(s.dataset.duration) || 2200; const t = Math.min(1, Math.max(0, elapsed/dur)); const easeT = easeOutCubic(t); s.style.transform = `translateY(${-30 * easeT}px) scale(${0.6 + 0.4*easeT})`; s.style.opacity = String(Math.max(0, 1 - easeT)); if(t < 1) { aliveCount++; } else { try{ s.remove(); }catch(e){} } });
 
-    orbs.forEach((o, i)=>{
-      if (orbsFading) {
-        const fadeProgress = Math.min(1, (tNow - fadeOutStartTime) / fadeOutDuration);
-        const initialOpacity = 0.08 + (0.4 + Math.sin((fadeOutStartTime - startTime)/1000 + i) * 0.4) * 0.25;
-        o.style.opacity = String(initialOpacity * (1 - fadeProgress));
-        if (fadeProgress === 1) {
-          try { o.remove(); } catch(e) {}
-        }
-      } else {
-        const localT = (tNow - startTime)/1000 + i; const s = 0.4 + Math.sin(localT * (0.3 + i*0.02)) * 0.4; o.style.opacity = String(0.08 + s*0.25); const dx = Math.sin(localT * (0.6 + i*0.05)) * 18; const dy = Math.cos(localT * (0.5 + i*0.03)) * 12; o.style.transform = `translate(${dx}px, ${dy}px)`;
-      }
-    });
-
-    if(aliveCount > 0 || orbsFading && (tNow - fadeOutStartTime) < fadeOutDuration) {
+    if(aliveCount > 0) {
       requestAnimationFrame(loop);
-    } else {
-      orbs.forEach(o => { try { o.remove(); } catch(e) {} });
     }
   }
   requestAnimationFrame(loop);
@@ -499,8 +866,12 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
     if (name1 && name2 && name1[0].toLowerCase() === name2[0].toLowerCase()) final = Math.min(100, final + 3);
     btn.disabled = true;
     btn.setAttribute('aria-pressed','true');
-    btn.textContent = 'Processing...';
+    const originalButtonContent = btn.innerHTML;
+    btn.querySelector('span').textContent = 'Predicting...';
+
     pct.textContent = '';
+    msg.textContent = 'Calculating your cosmic connection...';
+
     await animateNumber(pct, 0, final, 950);
     doPop(pct);
     msg.textContent = produceMessage(final);
@@ -512,7 +883,8 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
     }
     btn.disabled = false;
     btn.setAttribute('aria-pressed','false');
-    btn.innerHTML = `<svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.74 0 3.41 1.01 4.5 2.09C12.59 5.01 14.26 4 16 4 18.5 4 20.5 6 20.5 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg><span>Predict</span>`;
+    btn.innerHTML = originalButtonContent;
+    btn.querySelector('span').textContent = 'Predict';
   }
   [a,b].forEach(input => {
     input.addEventListener('keydown', e=>{
@@ -522,5 +894,6 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
   btn.addEventListener('click', predict);
 })();
 </script>
+
 </body>
 </html>
