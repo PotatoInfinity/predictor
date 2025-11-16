@@ -408,7 +408,7 @@ input[type="text"]:focus, select:focus {
 
 .controls{ grid-column:1/-1; display:flex; gap:12px; justify-content:center; margin-top:8px; z-index:10; }
 
-button.predict{
+button.predict, button.quiz-btn {
   position: relative;
   overflow: hidden;
   padding: 13px 24px;
@@ -424,14 +424,14 @@ button.predict{
   align-items:center;
   gap:10px;
 }
-:root:not([data-theme="dark"]) button.predict {
+:root:not([data-theme="dark"]) button.predict, :root:not([data-theme="dark"]) button.quiz-btn {
   background: linear-gradient(135deg, #ff709a, #e65a82);
   border: 1px solid transparent;
   box-shadow:
     inset 0 1.5px 2px rgba(255,255,255,0.3),
     0 8px 20px rgba(180, 80, 120, 0.3);
 }
-:root[data-theme="dark"] button.predict {
+:root[data-theme="dark"] button.predict, :root[data-theme="dark"] button.quiz-btn {
   background: linear-gradient(135deg, rgba(255,154,196,0.15), rgba(255,106,158,0.1));
   border: 1px solid rgba(255,154,196,0.3);
   border-top-color: rgba(255,154,196,0.4);
@@ -441,7 +441,7 @@ button.predict{
     0 8px 20px rgba(8,4,16,0.4);
 }
 
-button.predict::before {
+button.predict::before, button.quiz-btn::before {
   content: '';
   position: absolute;
   z-index: 1;
@@ -449,35 +449,35 @@ button.predict::before {
   opacity: 0;
   transition: opacity 300ms ease;
 }
-:root[data-theme="dark"] button.predict::before {
+:root[data-theme="dark"] button.predict::before, :root[data-theme="dark"] button.quiz-btn::before {
   background: linear-gradient(135deg, rgba(255,154,196,0.25), rgba(255,106,158,0.2));
 }
 
-button.predict > * {
+button.predict > *, button.quiz-btn > * {
   position: relative;
   z-index: 2;
 }
 
-button.predict:hover{
+button.predict:hover, button.quiz-btn:hover {
   transform: translateY(-4px) scale(1.02);
 }
-:root:not([data-theme="dark"]) button.predict:hover {
+:root:not([data-theme="dark"]) button.predict:hover, :root:not([data-theme="dark"]) button.quiz-btn:hover {
   background: linear-gradient(135deg, #ff80a5, #f06b90);
   box-shadow:
     inset 0 1.5px 2px rgba(255,255,255,0.35),
     0 12px 30px rgba(200, 90, 130, 0.4);
 }
-:root[data-theme="dark"] button.predict:hover {
+:root[data-theme="dark"] button.predict:hover, :root[data-theme="dark"] button.quiz-btn:hover {
   border-color: rgba(255,154,196,0.5);
   box-shadow:
     inset 0 1.5px 2px rgba(255,255,255,0.15),
     0 12px 30px rgba(255,90,160,0.3);
 }
-:root[data-theme="dark"] button.predict:hover::before {
+:root[data-theme="dark"] button.predict:hover::before, :root[data-theme="dark"] button.quiz-btn:hover::before {
   opacity: 1;
 }
 
-button.predict:active{
+button.predict:active, button.quiz-btn:active {
   transform: translateY(0) scale(1);
   transition-duration: 100ms;
 }
@@ -494,6 +494,7 @@ button.predict .icon path{
   border-radius:14px;
   text-align:center;
   transition: background var(--transition-medium), border-color var(--transition-medium), box-shadow var(--transition-medium);
+  min-height: 140px;
 }
 :root:not([data-theme="dark"]) .result {
   background: rgba(255, 252, 254, 0.5);
@@ -536,6 +537,11 @@ button.predict .icon path{
 }
 :root[data-theme="dark"] .msg {
   color: #fff;
+}
+
+#startQuizBtn {
+  margin-top: 16px;
+  display: none; /* Initially hidden */
 }
 
 
@@ -586,90 +592,196 @@ button.predict .icon path{
 
 .visually-hidden{ position: absolute !important; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
 
-.theme-switch-wrapper {
+.theme-toggle-btn {
   position: fixed;
   top: 15px;
   right: 15px;
   z-index: 100;
-  display: flex;
-  align-items: center;
-}
-
-.theme-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
-
-.theme-switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #4c4c6d;
-  transition: .4s;
-  border-radius: 34px;
-}
-
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: .4s;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
+  border: none;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  transition: transform var(--transition-fast), box-shadow var(--transition-medium), background-color var(--transition-medium);
 }
-
-input:checked + .slider {
-  background-color: #e65a82;
+.theme-toggle-btn:hover {
+  transform: scale(1.1) rotate(15deg);
 }
-
-input:checked + .slider:before {
-  transform: translateX(26px);
+:root:not([data-theme="dark"]) .theme-toggle-btn {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 12px rgba(100, 80, 120, 0.1);
 }
-
-.slider .icon {
+:root:not([data-theme="dark"]) .theme-toggle-btn:hover {
+  background: rgba(255, 252, 254, 0.9);
+  box-shadow: 0 6px 16px rgba(100, 80, 120, 0.15);
+}
+:root[data-theme="dark"] .theme-toggle-btn {
+  background: var(--glass-light);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+:root[data-theme="dark"] .theme-toggle-btn:hover {
+  background: var(--glass-strong);
+  border-color: rgba(255,255,255,0.15);
+}
+.theme-toggle-btn svg {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  user-select: none;
-  transition: opacity 0.2s ease;
+  width: 22px;
+  height: 22px;
+  transition: transform 0.4s cubic-bezier(0.87, 0, 0.13, 1), opacity 0.3s ease-in-out;
+  will-change: transform, opacity;
 }
-
-.slider .moon {
-  left: 8px;
+:root:not([data-theme="dark"]) .theme-toggle-btn .sun {
+  transform: rotate(0) scale(1);
   opacity: 1;
+  color: var(--text-color);
 }
-
-.slider .sun {
-  right: 8px;
+:root:not([data-theme="dark"]) .theme-toggle-btn .moon {
+  transform: rotate(90deg) scale(0.5);
   opacity: 0;
+  color: #fff;
 }
-
-input:checked + .slider .moon {
+:root[data-theme="dark"] .theme-toggle-btn .sun {
+  transform: rotate(-90deg) scale(0.5);
   opacity: 0;
+  color: var(--text-color);
 }
-
-input:checked + .slider .sun {
+:root[data-theme="dark"] .theme-toggle-btn .moon {
+  transform: rotate(0) scale(1);
   opacity: 1;
+  color: #fff;
 }
 
+/* Quiz Styles */
+.quiz-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--transition-medium), visibility var(--transition-medium);
+}
+.quiz-modal.visible {
+  opacity: 1;
+  visibility: visible;
+}
+.quiz-backdrop {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(10px);
+}
+:root:not([data-theme="dark"]) .quiz-backdrop {
+  background: rgba(248, 242, 250, 0.6);
+}
+:root[data-theme="dark"] .quiz-backdrop {
+  background: rgba(15, 2, 22, 0.6);
+}
+.quiz-content {
+  position: relative;
+  width: min(600px, 100%);
+  padding: 32px;
+  border-radius: var(--card-radius);
+  text-align: center;
+  transform: scale(0.95);
+  transition: transform var(--transition-medium);
+}
+.quiz-modal.visible .quiz-content {
+  transform: scale(1);
+}
+:root:not([data-theme="dark"]) .quiz-content {
+  background: rgba(255, 253, 254, 0.7);
+  border: 1px solid rgba(255,255,255,0.6);
+  box-shadow: var(--shadow-strong);
+}
+:root[data-theme="dark"] .quiz-content {
+  background: linear-gradient(168deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 15px 50px rgba(8,4,16,0.7);
+}
+.quiz-question {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.quiz-options {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.quiz-option {
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast);
+}
+.quiz-option:hover {
+  transform: translateY(-2px);
+}
+:root:not([data-theme="dark"]) .quiz-option {
+  background: var(--input-bg);
+  border-color: rgba(150, 130, 160, 0.15);
+  color: var(--text-color);
+}
+:root:not([data-theme="dark"]) .quiz-option:hover {
+  border-color: var(--accent-pink);
+  box-shadow: 0 4px 12px rgba(230, 90, 130, 0.15);
+}
+:root[data-theme="dark"] .quiz-option {
+  background-color: rgba(10,0,20,0.25);
+  border-color: transparent;
+  color: #fff;
+}
+:root[data-theme="dark"] .quiz-option:hover {
+  border-color: rgba(255,190,200,0.5);
+  background-color: rgba(10,0,20,0.5);
+  box-shadow: 0 0 18px rgba(255,150,200,0.15);
+}
+
+.quiz-results .big {
+  font-size: 3.5rem;
+}
+.quiz-results .msg {
+  font-size: 1.1rem;
+  margin-bottom: 24px;
+}
+.quiz-controls {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+.quiz-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+.quiz-close-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+:root:not([data-theme="dark"]) .quiz-close-btn { color: var(--text-color); }
+:root[data-theme="dark"]] .quiz-close-btn { color: #fff; }
 </style>
 
 </head>
@@ -686,32 +798,47 @@ input:checked + .slider .sun {
 
   <div id="confetti-container" aria-hidden="true"></div>
 
-  <div class="theme-switch-wrapper">
-    <label class="theme-switch" for="theme-toggle">
-        <input type="checkbox" id="theme-toggle" aria-label="Toggle light and dark mode"/>
-        <span class="slider">
-          <span class="icon moon">🌙</span>
-          <span class="icon sun">☀️</span>
-        </span>
-    </label>
-  </div>
+  <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle light and dark mode" style="background:none; border:none; cursor:pointer; width:48px; height:48px; display:flex; align-items:center; justify-content:center;">
+  <!-- Sun Icon -->
+  <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="display:block;">
+    <circle cx="12" cy="12" r="5"/>
+    <!-- vertical rays -->
+    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2"/>
+    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2"/>
+    <!-- horizontal rays -->
+    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2"/>
+    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2"/>
+    <!-- diagonal rays -->
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2"/>
+  </svg>
 
-
+  <!-- Moon Icon -->
+  <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"> <mask id="moon-mask"> <rect x="0" y="0" width="24" height="24" fill="white"/> <!-- mask circle to cut out part of the moon --> <circle cx="16" cy="12" r="9" fill="black"/> </mask> <circle cx="12" cy="12" r="9" mask="url(#moon-mask)"/> </svg>
+    <mask id="moon-mask">
+      <rect x="0" y="0" width="24" height="24" fill="white"/>
+      <circle cx="16" cy="12" r="9" fill="white"/>
+    </mask>
+    <circle cx="12" cy="12" r="9" mask="url(#moon-mask)"/>
+  </svg>
+</button>
   <div id="app" class="wrap" role="application" aria-label="Love Predictor application">
     <main class="card" role="main" aria-labelledby="title">
       <h1 id="title">Love Predictor</h1>
       <p class="lead">Discover the cosmic connection between two names.</p>
 
-      <div class="glass" aria-labelledby="labelA">
-        <label id="labelA" for="nameA">Name 1</label>
-        <input id="nameA" type="text" autocomplete="name" placeholder="e.g. Alex" aria-describedby="hintA" />
-        <div id="hintA" class="visually-hidden">Enter the first person's name.</div>
+      <div class="glass" aria-labelledby="labelMale">
+        <label id="labelMale" for="nameA">Male</label>
+        <input id="nameA" type="text" autocomplete="name" placeholder="e.g. Alex" aria-describedby="hintMale" />
+        <div id="hintMale" class="visually-hidden">Enter the male person's name.</div>
       </div>
 
-      <div class="glass" aria-labelledby="labelB">
-        <label id="labelB" for="nameB">Name 2</label>
-        <input id="nameB" type="text" autocomplete="name" placeholder="e.g. Taylor" aria-describedby="hintB" />
-        <div id="hintB" class="visually-hidden">Enter the second person's name.</div>
+      <div class="glass" aria-labelledby="labelFemale">
+        <label id="labelFemale" for="nameB">Female</label>
+        <input id="nameB" type="text" autocomplete="name" placeholder="e.g. Taylor" aria-describedby="hintFemale" />
+        <div id="hintFemale" class="visually-hidden">Enter the female person's name.</div>
       </div>
 
       <div class="glass" aria-labelledby="labelZodiacA">
@@ -761,12 +888,36 @@ input:checked + .slider .sun {
         </button>
       </div>
 
-      <div class="result" id="result" aria-live="polite" aria-atomic="true" style="min-height: 120px;">
+      <div class="result" id="result" aria-live="polite" aria-atomic="true">
         <div class="big" id="percent" aria-hidden="true"></div>
         <div class="msg" id="message"></div>
+        <button class="quiz-btn" id="startQuizBtn" type="button">Take Compatibility Quiz</button>
       </div>
     </main>
   </div>
+
+  <!-- Quiz Modal -->
+  <div class="quiz-modal" id="quizModal" role="dialog" aria-modal="true" aria-labelledby="quiz-title">
+    <div class="quiz-backdrop" id="quizBackdrop"></div>
+    <div class="quiz-content">
+      <button class="quiz-close-btn" id="quizCloseBtn" aria-label="Close quiz">&times;</button>
+
+      <div id="quizContainer">
+        <h2 class="quiz-question" id="quizQuestion"></h2>
+        <ul class="quiz-options" id="quizOptions"></ul>
+      </div>
+
+      <div class="quiz-results" id="quizResultsContainer" style="display: none;">
+        <h2 id="quiz-title">Quiz Results</h2>
+        <div class="big" id="quizPercent"></div>
+        <div class="msg" id="quizMessage"></div>
+        <div class="quiz-controls">
+          <button class="quiz-btn" id="retakeQuizBtn">Retake Quiz</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
 <script>
 (function() {
@@ -775,13 +926,13 @@ input:checked + .slider .sun {
 
   function applyTheme(theme) {
     docEl.setAttribute('data-theme', theme);
-    themeToggle.checked = theme === 'light';
   }
   const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
   applyTheme(savedTheme);
-  themeToggle.addEventListener('change', () => {
-    const newTheme = themeToggle.checked ? 'light' : 'dark';
-    docEl.setAttribute('data-theme', newTheme);
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = docEl.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
     localStorage.setItem('theme', newTheme);
   });
 })();
@@ -882,6 +1033,7 @@ function launchUltraPremiumConfetti({count=140, intensity=1.0} = {}){
   requestAnimationFrame(loop);
 }
 function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
+
 (function(){
   const a = document.getElementById('nameA');
   const b = document.getElementById('nameB');
@@ -891,6 +1043,7 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
   const pct = document.getElementById('percent');
   const msg = document.getElementById('message');
   const card = document.querySelector('.card');
+  const startQuizBtn = document.getElementById('startQuizBtn');
 
   const zodiacCompatibility = {
       Aries: { Aries: 'High', Taurus: 'Medium', Gemini: 'High', Cancer: 'Low', Leo: 'High', Virgo: 'Low', Libra: 'Medium', Scorpio: 'Low', Sagittarius: 'High', Capricorn: 'Low', Aquarius: 'High', Pisces: 'Medium' },
@@ -928,6 +1081,7 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
     if(!name1 && !name2){
       pct.textContent = '';
       msg.textContent = 'Please type at least one name.';
+      startQuizBtn.style.display = 'none';
       return;
     }
     const intA = nameToInt(name1);
@@ -954,9 +1108,7 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
       zodiacBonus = -20 + Math.floor(rng() * 11); // -20 to -10
     }
     final += zodiacBonus;
-
     final = Math.max(0, Math.min(100, final));
-
 
     btn.disabled = true;
     btn.setAttribute('aria-pressed','true');
@@ -965,10 +1117,13 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
 
     pct.textContent = '';
     msg.textContent = 'Calculating your cosmic connection...';
+    startQuizBtn.style.display = 'none';
 
     await animateNumber(pct, 0, final, 950);
     doPop(pct);
     msg.textContent = produceMessage(final);
+    startQuizBtn.style.display = 'inline-flex';
+
     const intensity = final >= 90 ? 1.4 : final >= 75 ? 1.15 : final >= 60 ? 1.0 : final >= 40 ? 0.7 : 0.45;
     if(final >= 40){
       setTimeout(()=> launchUltraPremiumConfetti({count: Math.round(90 * intensity), intensity}), 140);
@@ -978,7 +1133,6 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
     btn.disabled = false;
     btn.setAttribute('aria-pressed','false');
     btn.innerHTML = originalButtonContent;
-    btn.querySelector('span').textContent = 'Predict';
   }
   [a,b].forEach(input => {
     input.addEventListener('keydown', e=>{
@@ -987,7 +1141,173 @@ function easeOutCubic(x){ return 1 - Math.pow(1 - x, 3); }
   });
   btn.addEventListener('click', predict);
 })();
+
+// Quiz Logic
+(function() {
+    const quizModal = document.getElementById('quizModal');
+    const quizBackdrop = document.getElementById('quizBackdrop');
+    const startQuizBtn = document.getElementById('startQuizBtn');
+    const quizCloseBtn = document.getElementById('quizCloseBtn');
+    const retakeQuizBtn = document.getElementById('retakeQuizBtn');
+    const quizContainer = document.getElementById('quizContainer');
+    const quizResultsContainer = document.getElementById('quizResultsContainer');
+    const quizQuestionEl = document.getElementById('quizQuestion');
+    const quizOptionsEl = document.getElementById('quizOptions');
+    const quizPercentEl = document.getElementById('quizPercent');
+    const quizMessageEl = document.getElementById('quizMessage');
+
+    const quizData = [
+        {
+            question: "What's your ideal date night?",
+            options: [
+                { text: "Cozy night in with a movie", points: 10 },
+                { text: "Fancy dinner at a new restaurant", points: 8 },
+                { text: "Adventurous outdoor activity", points: 6 },
+                { text: "Live concert or a party", points: 4 }
+            ]
+        },
+        {
+            question: "How do you prefer to communicate after a disagreement?",
+            options: [
+                { text: "Talk it out immediately", points: 10 },
+                { text: "Take some space first, then talk", points: 8 },
+                { text: "Prefer to write down my thoughts", points: 6 },
+                { text: "Wait for the other person to initiate", points: 4 }
+            ]
+        },
+        {
+            question: "Pick a vacation style:",
+            options: [
+                { text: "Relaxing on a beach", points: 8 },
+                { text: "Exploring a bustling city", points: 6 },
+                { text: "Hiking in the mountains", points: 10 },
+                { text: "A cultural tour of historic sites", points: 4 }
+            ]
+        },
+        {
+            question: "What's your love language for receiving affection?",
+            options: [
+                { text: "Words of Affirmation", points: 10 },
+                { text: "Acts of Service", points: 8 },
+                { text: "Receiving Gifts", points: 4 },
+                { text: "Quality Time", points: 10 },
+                { text: "Physical Touch", points: 6 }
+            ]
+        },
+        {
+            question: "A perfect weekend involves:",
+            options: [
+                { text: "Socializing with a big group of friends", points: 4 },
+                { text: "A quiet time with a book or hobby", points: 8 },
+                { text: "A mix of chores and relaxation", points: 6 },
+                { text: "Spontaneous road trip", points: 10 }
+            ]
+        },
+        {
+            question: "How important is spontaneity in a relationship?",
+            options: [
+                { text: "Very important, I love surprises!", points: 10 },
+                { text: "Nice to have, but I prefer plans", points: 6 },
+                { text: "Not important, stability is key", points: 4 }
+            ]
+        },
+        {
+            question: "What role does humor play in your connection?",
+            options: [
+                { text: "It's essential, we need to laugh together", points: 10 },
+                { text: "It's a nice bonus", points: 6 },
+                { text: "I prefer serious, deep conversations", points: 4 }
+            ]
+        },
+        {
+            question: "When facing a challenge, you are more likely to:",
+            options: [
+                { text: "Rely on logic and strategy", points: 6 },
+                { text: "Trust your intuition and feelings", points: 8 },
+                { text: "Seek advice from others", points: 4 },
+                { text: "Tackle it head-on with your partner", points: 10 }
+            ]
+        },
+        {
+            question: "How do you feel about sharing personal finances?",
+            options: [
+                { text: "Everything should be joint", points: 8 },
+                { text: "Keep them mostly separate", points: 6 },
+                { text: "A mix of both (joint and separate accounts)", points: 10 },
+                { text: "I haven't really thought about it", points: 4 }
+            ]
+        },
+        {
+            question: "Your ideal partner should be your:",
+            options: [
+                { text: "Best friend and lover", points: 10 },
+                { text: "Passionate, romantic counterpart", points: 8 },
+                { text: "Supportive and stable rock", points: 6 },
+                { text: "Adventurous partner-in-crime", points: 10 }
+            ]
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    function startQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        quizResultsContainer.style.display = 'none';
+        quizContainer.style.display = 'block';
+        quizModal.classList.add('visible');
+        displayQuestion();
+    }
+
+    function displayQuestion() {
+        const question = quizData[currentQuestionIndex];
+        quizQuestionEl.textContent = question.question;
+        quizOptionsEl.innerHTML = '';
+        question.options.forEach(option => {
+            const li = document.createElement('li');
+            const button = document.createElement('button');
+            button.className = 'quiz-option';
+            button.textContent = option.text;
+            button.dataset.points = option.points;
+            button.onclick = () => selectAnswer(option.points);
+            li.appendChild(button);
+            quizOptionsEl.appendChild(li);
+        });
+    }
+
+    function selectAnswer(points) {
+        score += points;
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            displayQuestion();
+        } else {
+            showQuizResult();
+        }
+    }
+
+    function showQuizResult() {
+        quizContainer.style.display = 'none';
+        quizResultsContainer.style.display = 'block';
+        
+        const maxScore = quizData.reduce((sum, q) => sum + Math.max(...q.options.map(o => o.points)), 0);
+        const percentage = Math.round((score / maxScore) * 100);
+
+        animateNumber(quizPercentEl, 0, percentage, 800);
+        quizMessageEl.textContent = produceMessage(percentage);
+        doPop(quizPercentEl);
+    }
+
+    function closeQuiz() {
+        quizModal.classList.remove('visible');
+    }
+
+    startQuizBtn.addEventListener('click', startQuiz);
+    quizCloseBtn.addEventListener('click', closeQuiz);
+    quizBackdrop.addEventListener('click', closeQuiz);
+    retakeQuizBtn.addEventListener('click', startQuiz);
+})();
 </script>
 
 </body>
-</html>
+</html>```
